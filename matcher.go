@@ -19,11 +19,20 @@ func NewMatcher() *Matcher {
 }
 
 // AcceptRunes modifies a Matcher to accept any runes that
-// are contained withing the proveded string.
+// are contained withing the provided string.
 // The modified Matcher is returned to the caller.
 func (m *Matcher) AcceptRunes(valid string) *Matcher {
 	// TODO: check up on the implementation details of the rune vs byte slice thing
 	r := &runeMatcher{valid}
+	m.add(r)
+	return m
+}
+
+// RejectRunes modifies a Matcher to accept any runes
+// that are not contained withing the provided string.
+// The modified Matcher is returned to the caller.
+func (m *Matcher) RejectRunes(invalid string) *Matcher {
+	r := &runeFilter{invalid}
 	m.add(r)
 	return m
 }
@@ -88,6 +97,18 @@ func (r *runeMatcher) match(l *Lexer) bool {
 	}
 	l.Backup()
 	return false
+}
+
+type runeFilter struct {
+	invalid string
+}
+
+func (r *runeFilter) match(l *Lexer) bool {
+	if strings.IndexRune(r.invalid, l.Next()) >= 0 {
+		l.Backup()
+		return false
+	}
+	return true
 }
 
 type unicodeRangeMatcher struct {
