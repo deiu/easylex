@@ -23,8 +23,8 @@ func (t Token) String() string {
 	case TokenEOF:
 		return "EOF"
 	}
-	if len(t.Val) > 10 {
-		return fmt.Sprintf("%.10q...", t.Val)
+	if len(t.Val) > 23 {
+		return fmt.Sprintf("%.10q...%.10q", t.Val, t.Val[len(t.Val)-10:])
 	}
 	return fmt.Sprintf("%q", t.Val)
 }
