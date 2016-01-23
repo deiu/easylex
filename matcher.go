@@ -1,5 +1,9 @@
 package easylex
 
+import (
+	"strings"
+)
+
 type Matcher struct {
 	*unionMatcher
 }
