@@ -83,10 +83,10 @@ type runeMatcher struct {
 }
 
 func (r *runeMatcher) match(l *Lexer) bool {
-	if strings.IndexRune(r.valid, l.next()) >= 0 {
+	if strings.IndexRune(r.valid, l.Next()) >= 0 {
 		return true
 	}
-	l.backup()
+	l.Backup()
 	return false
 }
 
@@ -96,11 +96,11 @@ type unicodeRangeMatcher struct {
 }
 
 func (u *unicodeRangeMatcher) match(l *Lexer) bool {
-	next := l.next()
+	next := l.Next()
 	if next >= u.first && next <= u.last {
 		return true
 	}
-	l.backup()
+	l.Backup()
 	return false
 }
 
