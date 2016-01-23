@@ -6,6 +6,10 @@ import (
 	"unicode/utf8"
 )
 
+const (
+	EOF = rune(-1)
+)
+
 // Lexer is a struct that holds all private state
 // necessare for lexing.
 type Lexer struct {
@@ -67,7 +71,7 @@ func (l *Lexer) Errorf(format string, args ...interface{}) StateFn {
 func (l *Lexer) Next() rune {
 	if l.pos >= len(l.input) {
 		l.width = 0
-		return eof
+		return EOF
 	}
 	var r rune
 	r, l.width = utf8.DecodeRuneInString(l.input[l.pos:])
