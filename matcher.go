@@ -39,7 +39,7 @@ func (m *Matcher) AcceptUnicodeRange(first, last rune) *Matcher {
 // accepted characters.
 // The modified Matcher is returned to the caller.
 func (m *Matcher) Union(other *Matcher) *Matcher {
-	u := other.(*unionMatcher)
+	u := other
 	m.add(u)
 	return m
 }
