@@ -66,7 +66,7 @@ func (m *Matcher) MatchRun(l *Lexer) bool {
 	success := false
 	for m.match(l) {
 		if !success {
-			success := true
+			success = true
 		}
 	}
 	return success

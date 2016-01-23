@@ -16,11 +16,11 @@ type Token struct {
 	Val string
 }
 
-func (t token) String() string {
+func (t Token) String() string {
 	switch t.Typ {
 	case TokenError:
 		return t.Val
-	case tokenEOF:
+	case TokenEOF:
 		return "EOF"
 	}
 	if len(t.Val) > 10 {

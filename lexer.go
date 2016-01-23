@@ -2,7 +2,6 @@ package easylex
 
 import (
 	"fmt"
-	"strings"
 	"unicode/utf8"
 )
 
@@ -33,7 +32,7 @@ func Lex(input string, state StateFn) *Lexer {
 
 // NextToken returns the next token in the input
 // currently being lexed.
-func (l *charMatchLexer) NextToken() Token {
+func (l *Lexer) NextToken() Token {
 	for {
 		select {
 		case tok := <-l.tokens:
@@ -47,7 +46,7 @@ func (l *charMatchLexer) NextToken() Token {
 // Emit queues a token of the given type for retrieval by
 // NextToken(). The token value is equal to all the runes
 // processed since the last call to Emit() or Ignore().
-func (l *Lexer) Emit(t tokenType) {
+func (l *Lexer) Emit(t TokenType) {
 	l.tokens <- Token{
 		t,
 		l.input[l.start:l.pos],
