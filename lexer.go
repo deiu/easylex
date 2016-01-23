@@ -40,6 +40,9 @@ func (l *charMatchLexer) NextToken() Token {
 	}
 }
 
+// Emit queues a token of the given type for retrieval by
+// NextToken(). The token value is equal to all the runes
+// processed since the last call to Emit() or Ignore().
 func (l *Lexer) Emit(t tokenType) {
 	l.tokens <- Token{
 		t,
@@ -48,15 +51,20 @@ func (l *Lexer) Emit(t tokenType) {
 	l.start = l.pos
 }
 
+// Errorf emits an error token (a token of type TokenError)
+// with a value equal to the formatted string.
 func (l *Lexer) Errorf(format string, args ...interface{}) StateFn {
 	l.tokens <- Token{
-		tokenError,
+		TokenError,
 		fmt.Sprintf(format, args),
 	}
 	return nil
 }
 
-func (l *Lexer) next() rune {
+// Next returns one rune and increments l.pos by the
+// width of that rune. The width of the last rune
+// processed is stored in l.width.
+func (l *Lexer) Next() rune {
 	if l.pos >= len(l.input) {
 		l.width = 0
 		return eof
@@ -67,26 +75,24 @@ func (l *Lexer) next() rune {
 	return r
 }
 
-// backup decrements l.pos by the width of the last rune
-// processed. backup can only be called once per call to
-// next().
-func (l *Lexer) backup() {
+// Backup decrements l.pos by the width of the last rune
+// processed. Backup can only be called once per call to
+// Next().
+func (l *Lexer) Backup() {
 	l.pos -= l.width
 }
 
-// TODO: currently these two are not used, but they may be in the future.
-
-// ignore resets l.start to the current value of l.pos.
+// Ignore resets l.start to the current value of l.pos.
 // this ignores all the runes processed since the last
-// call to ignore() or emit().
-func (l *Lexer) ignore() {
+// call to Ignore() or Emit().
+func (l *Lexer) Ignore() {
 	l.start = l.pos
 }
 
-// peek returns the value of the rune at l.pos + 1, but
+// Peek returns the value of the rune at l.pos + 1, but
 // does not mutate lexer state.
-func (l *Lexer) peek() rune {
-	r := l.next()
-	l.backup()
+func (l *Lexer) Peek() rune {
+	r := l.Next()
+	l.Backup()
 	return r
 }
