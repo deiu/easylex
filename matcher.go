@@ -46,6 +46,15 @@ func (m *Matcher) AcceptUnicodeRange(first, last rune) *Matcher {
 	return m
 }
 
+// AcceptString modifies a Matcher to accept a string of
+// characters in the input that exactly matches the provided
+// string. The modified Matcher is returned to the caller.
+func (m *Matcher) AcceptString(exact string) *Matcher {
+	p := &prefixMatcher{exact}
+	m.add(p)
+	return m
+}
+
 // Union modifies a Matcher to accept the set of characters
 // equal to the union between the current Matcher's set of
 // accepted characters and another Matcher's set of
@@ -122,6 +131,18 @@ func (u *unicodeRangeMatcher) match(l *Lexer) bool {
 		return true
 	}
 	l.Backup()
+	return false
+}
+
+type prefixMatcher struct {
+	prefix string
+}
+
+func (p *prefixMatcher) match(l *Lexer) bool {
+	if strings.HasPrefix(l.input[l.pos:], p.prefix) {
+		l.pos += len(p.prefix)
+		return true
+	}
 	return false
 }
 
