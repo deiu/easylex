@@ -26,7 +26,7 @@ func Lex(input string, state StateFn) *Lexer {
 	return &Lexer{
 		input:  input,
 		state:  state,
-		tokens: make(chan Token, 2),
+		tokens: make(chan Token, 3), // TODO: troubleshoot buffer issues
 	}
 }
 
@@ -38,6 +38,9 @@ func (l *Lexer) NextToken() Token {
 		case tok := <-l.tokens:
 			return tok
 		default:
+			if l.state == nil {
+				break
+			}
 			l.state = l.state(l)
 		}
 	}
