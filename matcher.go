@@ -1,6 +1,7 @@
 package easylex
 
 import (
+	"regexp"
 	"strings"
 )
 
@@ -55,7 +56,7 @@ func (m *Matcher) AcceptString(exact string) *Matcher {
 	return m
 }
 
-func (m *Matcher) AcceptRegex(re *regexp.Regexp) {
+func (m *Matcher) AcceptRegex(re *regexp.Regexp) *Matcher {
 	r := &regexMatcher{re}
 	m.add(r)
 	return m
@@ -94,6 +95,36 @@ func (m *Matcher) MatchRun(l *Lexer) bool {
 		}
 	}
 	return success
+}
+
+// Peek returns true if the next input sequence conforms
+// to the rules currently represented by this Matcher.
+// Peek will always leave the state of the Lexer unchanged.
+func (m *Matcher) Peek(l *Lexer) bool {
+	pos := l.pos
+	matched := m.match(l)
+	l.pos = pos
+	return matched
+}
+
+// AssertOne works identically to MatchOne, except it
+// will emit an error token if the match fails instead
+// of returning a boolean.
+func (m *Matcher) AssertOne(l *Lexer, err string, args ...interface{}) {
+	success := m.MatchOne(l)
+	if !success {
+		l.Errorf(err, args...)
+	}
+}
+
+// AssertRun works identically to MatchRun, except it
+// will emit an error token if the match fails instead
+// of returning a boolean.
+func (m *Matcher) AssertRun(l *Lexer, err string, args ...interface{}) {
+	success := m.MatchRun(l)
+	if !success {
+		l.Errorf(err, args...)
+	}
 }
 
 // TODO: make textMatcher an exported interface and allow the
@@ -157,7 +188,7 @@ type regexMatcher struct {
 }
 
 func (r *regexMatcher) match(l *Lexer) bool {
-	loc := regex.FindIndex(l.input[l.pos:])
+	loc := r.regex.FindIndex([]byte(l.input[l.pos:]))
 	if loc == nil {
 		return false
 	} else if loc[0] != 0 {
