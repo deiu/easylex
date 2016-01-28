@@ -55,6 +55,12 @@ func (m *Matcher) AcceptString(exact string) *Matcher {
 	return m
 }
 
+func (m *Matcher) AcceptRegex(re *regexp.Regexp) {
+	r := &regexMatcher{re}
+	m.add(r)
+	return m
+}
+
 // Union modifies a Matcher to accept the set of characters
 // equal to the union between the current Matcher's set of
 // accepted characters and another Matcher's set of
@@ -144,6 +150,21 @@ func (p *prefixMatcher) match(l *Lexer) bool {
 		return true
 	}
 	return false
+}
+
+type regexMatcher struct {
+	regex *regexp.Regexp
+}
+
+func (r *regexMatcher) match(l *Lexer) bool {
+	loc := regex.FindIndex(l.input[l.pos:])
+	if loc == nil {
+		return false
+	} else if loc[0] != 0 {
+		return false
+	}
+	l.pos += loc[1]
+	return true
 }
 
 type unionMatcher struct {
