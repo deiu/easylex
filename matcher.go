@@ -97,6 +97,34 @@ func (m *Matcher) MatchRun(l *Lexer) bool {
 	return success
 }
 
+func (m *Matcher) MatchLookAhead(l *Lexer, lookahead *Matcher) bool {
+	pos := l.pos
+	matched := m.match(l)
+	if !matched {
+		return false
+	}
+	newPos := l.pos
+	matchedLookahead := lookahead.match(l)
+	if matchedLookahead {
+		l.pos = newPos
+		return true
+	} else {
+		l.pos = pos
+		return false
+	}
+	panic("unreachable")
+}
+
+func (m *Matcher) MatchLookAheadRun(l *Lexer, lookahead *Matcher) bool {
+	success := false
+	for m.MatchLookAhead(l, lookahead) {
+		if !success {
+			success = true
+		}
+	}
+	return success
+}
+
 // Peek returns true if the next input sequence conforms
 // to the rules currently represented by this Matcher.
 // Peek will always leave the state of the Lexer unchanged.
